@@ -1,0 +1,18 @@
+{
+  "name": "fortsapiparser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "out/index.js",
+  "scripts": {
+    "dev": "tsc && node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.16.3"
+  },
+  "dependencies": {
+    "node-html-parser": "^6.1.5"
+  }
+}
