@@ -13,7 +13,7 @@ let r = request(options, (res) => {
         data += chunk;
     });
     res.on('end', async () => {
-        writeFileSync('content.html', data);
+        //writeFileSync('content.html', data);
 
         createJSON(data)
     });
