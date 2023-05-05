@@ -2,12 +2,12 @@ import { parse } from 'node-html-parser';
 import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { request } from "https"
 
-function getDocFromWeb(){
+function getDocFromWeb() {
     let options = {
         host: 'www.earthworkgames.com',
         path: '/content/docs/FortsAPI.html'
     }
-    
+
     let r = request(options, (res) => {
         let data = '';
         res.on('data', (chunk) => {
@@ -15,7 +15,7 @@ function getDocFromWeb(){
         });
         res.on('end', async () => {
             //writeFileSync('content.html', data);
-    
+
             convertFonctions(data)
         });
     });
@@ -86,5 +86,72 @@ function getGlobalType() {
     writeFileSync('data/propreties.json', JSON.stringify(out, null, 3));
 
 }
+
+function createTypingFromJson() {
+    const data = JSON.parse(readFileSync('data/functions.json', { encoding: 'utf-8' }));
+
+    let out = '---@meta\n\n';
+
+    out += `---@alias Vector3D {  }\n`
+    out += `---@alias Vector2D {  }\n`
+    out += `---@alias Colour {  }\n\n\n`
+
+
+    const functionNames = Object.keys(data);
+
+    const unkownType = new Set();
+
+    for (let i = 0; i < functionNames.length; i++) {
+        const functionName = functionNames[i];
+        const doc = data[functionName].documentation[0] as string;
+        const returnType = getType(doc.split('(')[0].split(' ').splice(-2)[0] || 'unknow')
+
+        const args = doc.split('(')[1].slice(0, -1).split(', ');
+
+        const params: string[] = []
+
+        args.forEach(a => {
+            const paramType = getType(a);
+            const paramName = a.split('=')[0].split(' ').filter(d => d != '' && !!d).pop() || 'undefined';
+            params.push(paramName)
+            out += `---@param ${paramName} ${paramType}\n`
+        })
+
+        out +=
+            `---@return ${returnType}\n` +
+            `function ${functionName}(${params.join(', ')}) end\n\n`
+    }
+
+    writeFileSync('data/typing.lua', out);
+
+    console.log(unkownType)
+
+    function getType(type: string): string {
+        if (type.includes('int')) {
+            return 'integer'
+        } else if (type.includes('char*')) {
+            return 'string'
+        } else if (type.includes('float')) {
+            return 'number'
+        } else if (type.includes('bool')) {
+            return 'boolean'
+        } else if (type.includes('void')) {
+            return 'nil'
+        } else if (type.includes('wchar_t*')) {
+            return 'string'
+        } else if (type.includes('Vector3D')) {
+            return 'Vector3D'
+        }else if (type.includes('Vector2D')) {
+            return 'Vector2D'
+        }else if (type.includes('Colour')) {
+            return 'Colour'
+        } else {
+            unkownType.add(type);
+            return 'any'
+        }
+    }
+}
+
+createTypingFromJson();
 
 //console.log(require('./dumps/ts/device_sprites'))
