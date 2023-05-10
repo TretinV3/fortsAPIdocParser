@@ -7,6 +7,7 @@
 
 ---@param id integer
 ---@return integer
+---@source HelloWorld
 function DoorCountAI(id) end
 
 ---@param teamId integer
@@ -1101,10 +1102,10 @@ function GetRayHitSideId(undefined) end
 function GetRayHitTeamId(undefined) end
 
 ---@param start Vector3D
----@param End Vector3D
+---@param lineEnd Vector3D
 ---@param pt Vector3D
 ---@return Vector3D
-function LineSegNearestToPoint(start, End, pt) end
+function LineSegNearestToPoint(start, lineEnd, pt) end
 
 ---@param filename string
 ---@return nil

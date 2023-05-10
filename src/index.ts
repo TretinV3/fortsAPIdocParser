@@ -152,6 +152,35 @@ function createTypingFromJson() {
     }
 }
 
-createTypingFromJson();
+//createTypingFromJson();
 
-//console.log(require('./dumps/ts/device_sprites'))
+function createTypeFromProperties(){
+    const data = JSON.parse(readFileSync('data/propreties.json', { encoding: 'utf-8' }));
+
+    let out = `---@meta\n\n\n`;
+
+
+    const names = Object.keys(data);
+
+    for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        
+        out += `\n\n---@class ${name.slice(0, -1)}\n`
+
+        const properties = Object.keys(data[name]);
+
+        for (let i = 0; i < properties.length; i++) {
+            const propertie = properties[i];
+            out += `---@field ${propertie} ${data[name][propertie].replace('object', 'any')}\n`;
+        }
+
+        out += `\n---@type ${name.slice(0, -1)}[]\n${name} = {}\n`
+    }
+
+    writeFileSync('data/propreties.lua', out);
+
+    
+}
+
+//createTypeFromProperties()
+//console.log(require('../text.lua.txt'))
